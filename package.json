@@ -1,8 +1,8 @@
 {
-  "name": "project",
+  "name": "ozon-discount",
   "version": "1.0.0",
   "description": "",
-  "cdn": "https://ad.csdnevnik.ru/special/staging/folder/",
+  "cdn": "https://ad.csdnevnik.ru/special/staging/ozon-discount/",
   "main": "gulpfile.js",
   "dependencies": {},
   "devDependencies": {
