@@ -11,12 +11,26 @@ export default (function App(window, document, $){
 
 	let profile = {};
 
+	function asyncStart(){
+		console.log('go');
+		$button.attr('disabled', 'disabled');
+	}
+
+	function asyncEnd(){
+		console.log('end');
+		$button.attr('disabled', false);
+	}
+
+	function buttonHide(message){
+		console.log(message);
+		$button.hide();
+	}
+
 	function invite(){
 
 		$button.on('click', function(e){
 			e.preventDefault();
-			console.log('go');
-
+			asyncStart();
 
 			if (!profile.id){
 
@@ -26,9 +40,7 @@ export default (function App(window, document, $){
 				})
 				.then( user => {
 					profile = user;
-					if (canIDoIt()){
-						getAll();
-					}
+					return getAll();
 				})
 				.then( 
 					() => {
@@ -37,7 +49,9 @@ export default (function App(window, document, $){
 					err => {
 						console.log(err);
 					}
-				);
+				).then( () => {
+					asyncEnd();
+				});
 
 				return;
 			}
@@ -48,44 +62,39 @@ export default (function App(window, document, $){
 
 	function canIDoIt(){
 		if (profile.roles.indexOf('EduParent') === -1){
-			console.log('Только для родителей');
-			$button.hide();
+			buttonHide('Только для родителей');
 			return false;
 		}
 		return true;
 	}
 
+	function getUniqValuesFromArrays(arrays){
+		const joinArrays = [].concat.apply([], arrays); //join in one array
+		return Array.from(new Set(joinArrays)); // only unic
+	}
+
 
 	function getAll(){
+
+		let data = {};
 
 		if (!canIDoIt()){
 			return false;
 		}
 
-		$button.attr('disabled', 'disabled');
+		asyncStart();
 
-		let data = {};
-
-		API.getUserChildrenIds()
+		return API.getUserChildrenIds()
 		.then( childrenIds => {
 			console.log(childrenIds);
-			data.childrenIds = childrenIds;
-
-			const promises = [];
-
-			childrenIds.map( id => {
-				promises.push(API.getUser(id));
-			});
 			
-			return Promise.all(promises);
+			return API.getUsers(childrenIds);
 		})
 		.then( allChildrens => {
 			console.log(allChildrens);
 
-			const childrens = [].concat.apply([], allChildrens);
-			const UniqChildrens = Array.from(new Set(childrens));
+			const UniqChildrens = getUniqValuesFromArrays(allChildrens);
 
-			data.UniqChildrens = UniqChildrens;
 			data.ChildSchool = [];
 
 			const promises = [];
@@ -98,9 +107,7 @@ export default (function App(window, document, $){
 			return Promise.all(promises);
 		})
 		.then( allSchools => {
-			console.log('sdsdd');
 			console.log(allSchools);
-			console.log(data.ChildSchool);
 
 			const childrenSchools = [];
 
@@ -112,11 +119,7 @@ export default (function App(window, document, $){
 
 			console.log(childrenSchools);
 
-			const schools = [].concat.apply([], allSchools);
-
 			const promises = [];
-
-			console.log(data.UniqChildrens);
 
 			childrenSchools.map( (childrenSchool, i) => {
 				promises.push(API.getPersonEduGroupsBySchool(childrenSchool.childId, childrenSchool.schoolId));
@@ -127,10 +130,7 @@ export default (function App(window, document, $){
 		.then( AllEduGroups => {
 			console.log(AllEduGroups);
 
-			const eduGroups = [].concat.apply([], AllEduGroups);
-			const UniqEduGroups = Array.from(new Set(eduGroups));
-
-
+			const UniqEduGroups = getUniqValuesFromArrays(AllEduGroups);
 
 			const promises = [];
 
@@ -144,35 +144,12 @@ export default (function App(window, document, $){
 		.then( allEguGroupsChildrens => {
 			console.log(allEguGroupsChildrens);
 			
-			let allChildren = [];
-			let allChildrenIds = [];
-			let UniqAllChildrenIds = [];
-
-			allEguGroupsChildrens.map( childrens => {
-				allChildren = [...allChildren, ...childrens];
-			});
-
-			allChildren.map( children => {
-				allChildrenIds.push(children.userId_str);
-			}); 
-
-			console.log('allChildrenIds', allChildrenIds);
-
-			UniqAllChildrenIds = Array.from(new Set(allChildrenIds)).filter( childrenId => {
-			 	return childrenId && data.childrenIds.indexOf(childrenId) === -1;
-			});
+			const UniqAllChildren = getUniqValuesFromArrays(allEguGroupsChildrens);
 			
-			console.log('UniqAllChildrenIds', UniqAllChildrenIds);
-
-			return UniqAllChildrenIds;
-		})
-		.then( UniqAllChildrenIds => {
-			console.log(UniqAllChildrenIds);
-
 			let promises = [];
 
-			UniqAllChildrenIds.map( userId => {
-				promises.push(API.getUserRelatives(userId));
+			UniqAllChildren.map( user => {
+				promises.push(API.getUserRelatives(user.userId_str));
 			});
 			
 			return Promise.all(promises);
@@ -180,23 +157,12 @@ export default (function App(window, document, $){
 		.then( allPersonsParents => {
 			console.log(allPersonsParents);
 
-			let allParents = [];
-			let allParentsIds = [];
-			let UniqAllParentsIds = [];
+			const UniqAllParents = getUniqValuesFromArrays(allPersonsParents);
 
-			allPersonsParents.map( parents => {
-				allParents = [...allParents, ...parents];
-			}); 
-
-			console.log(allParents);
-
-			allParents.map( parent => {
-				allParentsIds.push(parent.person.userId_str);
-			}); 
-
-			console.log(allParentsIds);
-
-			UniqAllParentsIds = Array.from(new Set(allParentsIds)).filter( parentId => {
+			//get ids and filter own profile out
+			const UniqAllParentsIds = UniqAllParents.map( parent => {
+				return parent.person.userId_str
+			}).filter( parentId => {
 			 	return parentId !== profile.id_str;
 			});
 
@@ -211,30 +177,32 @@ export default (function App(window, document, $){
 		})
 		.then( (res) => {
 			console.log(res);
+			buttonHide('Сообщения были отправлены');
 			$result.html('Сообщения были отправлены');
-			$button.hide();
 		})
 		.catch( err => { 
-			$button.attr('disabled', false);
 			$result.html('Произошла ошибка, попробуйте еще раз');
 			console.error(err);
-		});
-
+		})
+		.then( () => {
+			asyncEnd();
+		});	
 	}
 
 	function getUser(){
-		$button.attr('disabled', 'disabled');
+		asyncStart();
 
 		API.getUser()
 		.then( user => {
 			console.log(user);
-			$button.attr('disabled', false);
 			profile = user;
 			canIDoIt();
 		})
 		.catch( err => {
-			$button.attr('disabled', false);
 			console.error(err);
+		})
+		.then( () => {
+			asyncEnd();
 		});	
 	}
 
