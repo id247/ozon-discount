@@ -1,21 +1,33 @@
 @charset "UTF-8";
 
-// @font-face {
-//     font-family: 'font';
-//     src: url('../fonts/fonr.woff') format('woff');
-//     font-weight: normal;
-//     font-style: normal;
-// }
+
+@font-face {
+    font-family: 'rotondac';
+    src: url('../fonts/rotondac.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'rotondac';
+    src: url('../fonts/rotondac-bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
 
 
-$mainFontFamily: Helvetica, sans-serif;
+$rotonda: rotondac;
+
+$mainFontFamily: $rotonda, Helvetica, sans-serif;
 
 //
 //colors
 //
 
 
-$text: #1c1c1c;
+$text: #565656;
+$red: #ff4338;
+$blue: #48b3f0;
 
 //
 //medias
