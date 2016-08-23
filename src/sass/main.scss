@@ -18,7 +18,7 @@
 
 .section{
 
-	padding: 60px 0 60px;
+	padding: 70px 0 70px;
 
 	&__wrap{
 		@include clearfix;
@@ -151,8 +151,8 @@
 	&__wrap{
 		border-top: 1px solid $text;
 		border-bottom: 1px solid $text;
-		padding-top: 50px;
-		padding-bottom: 50px;
+		padding-top: 70px;
+		padding-bottom: 80px;
 	}
 
 	&__title{
@@ -221,6 +221,8 @@
  * ========================================================================== */
 
 .share{
+
+	padding: 120px 0 60px;
 	
 	&__content{
 		padding: 0 195px;
