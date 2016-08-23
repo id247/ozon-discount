@@ -159,17 +159,22 @@
 		margin: 0 0 80px;
 	}
 
+	&__list-placeholder{
+		margin: 0 auto 50px;
+		max-width: 1140px;
+	}
+
 	&__list{
 		text-align: center;
-		margin: 0 20px 50px;
+		margin: 0 -3% -30px;
 	}
 	
 	&__item{
 		text-align: left;
 		display: inline-block;
 		vertical-align: top;
-		width: 26%;
-		margin: 0 3% 30px;
+		width: 27%;
+		margin: 0 2.5% 30px;
 	}
 
 	&__button-placeholder{
