@@ -1,0 +1,24 @@
+
+		</div><!-- /.body-container__content -->
+
+
+	</div> <!-- end .body-container -->
+
+	@@include("../common/modals.html", {})
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+	<script src="https://ad.csdnevnik.ru/special/prodaction/OAuth2/hello.min.js"></script>
+
+	<!-- main script -->
+	@@if (server === "dnevnik"){
+	<script src="assets/js/dnevnik.js"></script>
+	}	
+	@@if (server === "mosreg"){
+	<script src="assets/js/mosreg.js"></script>
+	}
+	@@if (server === "local"){
+	<script src="assets/js/local.js"></script>
+	}
+
+</body>
+</html>

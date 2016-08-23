@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Перенаправление на проект...</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+</head>
+<body>
+	<h3>Пожалуйста, закройте это окно для проложения.</h3>
+	<script>
+		window.onbeforeunload = function(){
+			document.getElementsByTagName('h3')[0].innerHTML='Перенаправляем на страницу проекта, пожалуйста, полождите...';
+		}
+	</script>
+	<script src="https://ad.csdnevnik.ru/special/prodaction/OAuth2/hello.min.js"></script>
+</body>
+</html>

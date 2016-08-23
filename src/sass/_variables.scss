@@ -1,0 +1,44 @@
+@charset "UTF-8";
+
+// @font-face {
+//     font-family: 'font';
+//     src: url('../fonts/fonr.woff') format('woff');
+//     font-weight: normal;
+//     font-style: normal;
+// }
+
+
+$mainFontFamily: Helvetica, sans-serif;
+
+//
+//colors
+//
+
+
+$text: #1c1c1c;
+
+//
+//medias
+//
+
+//@media #{$media-xs-max} {
+// 	background: red;
+//}
+
+$media-xs-max: "only screen and (max-width : 320px)";
+$media-xs-min: "only screen and (min-width : 320px)";
+
+$media-s-max: "only screen and (max-width : 480px)";
+$media-s-min: "only screen and (min-width : 480px)";
+
+$media-m-max: "only screen and (max-width : 768px)";
+$media-m-min: "only screen and (min-width : 768px)";
+
+$media-l-max: "only screen and (max-width : 992px)";
+$media-l-min: "only screen and (min-width : 992px)";
+
+$media-xl-max: "only screen and (max-width : 1024px)";
+$media-xl-min: "only screen and (min-width : 1024px)";
+
+$media-xxl-max: "only screen and (max-width : 1366px)";
+$media-xxl-min: "only screen and (min-width : 1366px)";

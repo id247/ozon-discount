@@ -1,0 +1,88 @@
+@charset "UTF-8";
+@mixin placeholder {
+  ::-webkit-input-placeholder {@content}
+  :-moz-placeholder           {@content}
+  ::-moz-placeholder          {@content}
+  :-ms-input-placeholder      {@content}  
+}
+// Пример использования
+//@include placeholder {
+//  color: #939291;
+//}
+
+
+@mixin clearfix{
+  &:before,
+  &:after{
+    content: " "; /* 1 */
+    display: table; /* 2 */
+  }
+  &:after{
+    clear: both;
+  }   
+  *zoom: 1;
+}
+
+@mixin list{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin justify{
+  text-align: justify;
+  &:after{
+    content: '';
+    width: 100%;
+    height: 0;
+    display: inline-block;     
+  }
+}
+
+
+@mixin wrap{
+	@include clearfix;
+	margin: auto;
+	padding: 0 0px;
+	width: 980px;
+}
+
+@mixin bg2x($name){
+
+  $url: '../images/bg/' + $name;
+  $url2x: '../images/bg2x/' + $name;
+
+  background-image: url( $url );
+
+  @media (-webkit-min-device-pixel-ratio: 2), 
+      (-o-min-device-pixel-ratio: 3/2), 
+      (min--moz-device-pixel-ratio: 2), 
+      (min-device-pixel-ratio: 2), 
+      (min-resolution: 144dppx) {
+      
+    background-image: url( $url2x );
+
+    }
+
+}
+
+
+@mixin icons($name){
+  //normal icons
+  $fullUrl: '../images/icons/' + $name + '@2x.png';
+  $iconUrl: 'icons/' + $name + '@2x.png';
+
+  $iconWidth: image-width( $iconUrl );
+  $iconHeight: image-height( $iconUrl );
+
+  background: url( $fullUrl ) 0 0 no-repeat;
+  //width: $iconWidth;  
+  //height: $iconHeight;
+  
+  //2x
+  width: $iconWidth / 2;  
+  height: $iconHeight / 2;
+  background-size: $iconWidth / 2, $iconHeight / 2;
+
+}
+
