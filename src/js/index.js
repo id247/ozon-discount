@@ -197,13 +197,20 @@ export default (function App(window, document, $){
 			console.log(allParentsIds);
 
 			UniqAllParentsIds = Array.from(new Set(allParentsIds)).filter( parentId => {
-			 	return parentId;
+			 	return parentId !== profile.id_str;
 			});
 
 			console.log(UniqAllParentsIds);
 
+			const invitesData = {
+				userIds: UniqAllParentsIds,
+				message: 'test',
+			}
+
+			return API.sendInvites(invitesData);
 		})
-		.then( () => {
+		.then( (res) => {
+			console.log(res);
 			$result.html('Сообщения были отправлены');
 			$button.hide();
 		})
