@@ -7,17 +7,20 @@ export default (function App(window, document, $){
 
 	const $button = $('.js-share');
 	const $result = $('.js-share-result');
+	const $loader = $('.js-share-loader');
 
 	let profile = {};
 
 	function asyncStart(){
 		console.log('go');
 		$button.attr('disabled', 'disabled');
+		$loader.show();
 	}
 
 	function asyncEnd(){
 		console.log('end');
 		$button.attr('disabled', false);
+		$loader.hide();
 	}
 
 	function buttonHide(message){
@@ -29,7 +32,7 @@ export default (function App(window, document, $){
 
 	function isItAParent(){
 		if (profile.roles.indexOf('EduParent') === -1){
-			buttonHide('Рассылка сообщений только для родителей');
+			buttonHide('Рассылка сообщений доступна только для родителей');
 			return false;
 		}
 		return true;
