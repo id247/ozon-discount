@@ -8,6 +8,9 @@ function paramsError(description){
 
 export default {
 	getUser: (userId = 'me') => {
+		if (!userId){
+			return paramsError('no userId in API.getUser');
+		}
 		const options = {
 			path: 'users/' + userId,
 		};
@@ -28,6 +31,9 @@ export default {
 		return Ajax(options);
 	},
 	getUserFriendsIds: (userId = 'me') => {
+		if (!userId){
+			return paramsError('no userId in API.getUserFriendsIds');
+		}
 		const options = {
 			path: 'users/' + userId + '/friends',
 		};
@@ -35,6 +41,9 @@ export default {
 		return Ajax(options);
 	},
 	getUserRelatives: (userId = 'me') => {
+		if (!userId){
+			return paramsError('no userId in API.getUserRelatives');
+		}
 		const options = {
 			path: 'users/' + userId + '/relatives',
 		};
@@ -82,6 +91,9 @@ export default {
 		return Ajax(options);
 	},
 	getUserSchools: (userId = 'me') => {
+		if (!userId){
+			return paramsError('no userId in API.getUserSchools');
+		}
 		const options = {
 			path: 'users/' + userId + '/schools',
 		};

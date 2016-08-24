@@ -47,25 +47,49 @@ export default (function App(window, document, $){
 		return filterUniqArrayValues( flatArrays(arrays) ); // only unic
 	}
 
+
+
+	//chunk arrays and send in to getPromisesFunc function wich returns a Promise or array of Promises
 	function getChunkPromises(items, chunkLength = 10, getPromisesFunc){
+
+		function isIterable(obj) {
+			// checks for null and undefined
+			if (obj == null) {
+			return false;
+			}
+			return typeof obj[Symbol.iterator] === 'function';
+		}
+
+		function getChunks(items, chunkLength = 10){
+
+			const chunks = [];
+
+			for (let i = 0; i < items.length ; i+=chunkLength){
+				chunks.push(items.slice(i,i+chunkLength));
+			}
+
+			return chunks;
+		}
+
 		return new Promise( (resolve, reject) => {
 
 			let count = 0;
 			const results = [];
+			const itemsChunks = getChunks(items, chunkLength);
 
-			for (let i = 0; i < items.length ; i+=chunkLength){
+			itemsChunks.map( itemsChunk => {
 				count++;
-
-				const itemsChunk = items.slice(i,i+chunkLength);
-				console.log(itemsChunk);
 
 				setTimeout(() => {
 
-					const promises = getPromisesFunc(itemsChunk); 
-
-					console.log(promises);
+					let promises = getPromisesFunc(itemsChunk); 
 
 					console.log('send chunk');
+
+					//in single Promise - push in to array for Promise.all
+					if (!isIterable(promises)){
+						promises = [promises];
+					}
 
 					Promise.all(promises)
 					.then( values => {
@@ -79,9 +103,9 @@ export default (function App(window, document, $){
 						reject( err );
 					});
 
-				}, count*150);
-			}
 
+				}, count*500);
+			});
 		});
 	}
 
@@ -111,7 +135,9 @@ export default (function App(window, document, $){
 
 			const promises = [];
 
-			UniqChildrens.map( (children, i) => {
+			UniqChildrens
+			.filter(children => (children.personId_str && children.id_str))
+			.map( (children, i) => {
 				data.SchoolChildPersonIds.push(children.personId_str);
 				promises.push(API.getUserSchools(children.id_str));
 			});
@@ -131,7 +157,7 @@ export default (function App(window, document, $){
 
 			console.log(childrenSchools);
 
-			const promises = childrenSchools.map( (childrenSchool, i) => {
+			const promises = childrenSchools.map( childrenSchool => {
 				return API.getPersonEduGroupsBySchool(childrenSchool.childPersonId, childrenSchool.schoolId);
 			});
 			
@@ -142,7 +168,9 @@ export default (function App(window, document, $){
 
 			const UniqEduGroups = getUniqValuesFromArrays(AllEduGroups);
 
-			const promises = UniqEduGroups.map( eguGroup => {
+			const promises = UniqEduGroups
+			.filter(eguGroup => eguGroup.id_str)
+			.map( eguGroup => {
 				return API.getEduGroupPersons(eguGroup.id_str);
 			});
 			
@@ -154,8 +182,10 @@ export default (function App(window, document, $){
 			
 			const UniqAllChildren = getUniqValuesFromArrays(allEguGroupsChildrens);
 			
-			return getChunkPromises(UniqAllChildren, 10, (array) => {
-				return array.map( user => {
+			return getChunkPromises(UniqAllChildren, 10, (UniqAllChildrenChunk) => {
+				return UniqAllChildrenChunk
+				.filter(user => user.userId_str)
+				.map( user => {
 					return API.getUserRelatives(user.userId_str);
 				});
 			});
@@ -163,11 +193,10 @@ export default (function App(window, document, $){
 		.then( allPersonsParents => {
 			console.log(allPersonsParents);
 
-			const UniqAllParents = getUniqValuesFromArrays(allPersonsParents);
-
 			//get ids and filter own profile and profile with no ID out
 			//and send only ot mothers and fathers
-			const UniqAllParentsIds = UniqAllParents.filter( parent => {
+			const AllParentsIds = flatArrays(allPersonsParents)
+			.filter( parent => {
 			 	if ( !parent.person.userId_str || (parent.person.userId_str === profile.id_str) ){
 			 		return false;
 			 	}
@@ -175,34 +204,21 @@ export default (function App(window, document, $){
 			 		return false;
 			 	}
 			 	return true;
-			}).map( parent => {
-				return parent.person.userId_str
+			})
+			.map( parent => {
+				return (parent.person.userId_str)
 			});
+
+			const UniqAllParentsIds = getUniqValuesFromArrays(AllParentsIds);
 
 			console.log(UniqAllParentsIds);
 
-			const promises = [];
-			const chunkLength = 10;
-			const invitesDatas = [];
-
-			for (let i = 0; i < UniqAllParentsIds.length ; i+=chunkLength){
-
-				const UniqAllParentsIdsChunk = UniqAllParentsIds.slice(i,i+chunkLength);
-
+			return getChunkPromises(UniqAllParentsIds, 10, (UniqAllParentsIdsChunk) => {
 				const invitesData = {
 					userIds: UniqAllParentsIdsChunk,
 					message: 'test',
 				}
-
-				invitesDatas.push(invitesData);
-			}
-
-			console.log('invitesDatas', invitesDatas);
-			
-			return getChunkPromises(invitesDatas, 10, (invitesDatas) => {
-				return invitesDatas.map( invitesData => {
-					return API.sendInvites(invitesData);
-				});
+				return API.sendInvites(invitesData);
 			});
 		})
 		.then( (res) => {
