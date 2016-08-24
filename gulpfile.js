@@ -93,10 +93,16 @@ gulp.task('html', function(callback){
 
 		var newDestFolder = destFolder + (folder !== 'local' ? '/' + folder : '');
 
-		return gulp.src([
+		var files = [
 			'src/html/*.html', 
 			'!src/html/_*.html', 
-			])
+		];
+
+		if (folder !== 'local'){
+			files.push('!src/html/oauth.html');
+		}
+
+		return gulp.src(files)
 			.pipe($.fileInclude({
 				prefix: '@@',
 				basepath: '@file',
