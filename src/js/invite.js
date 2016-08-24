@@ -47,24 +47,23 @@ export default (function App(window, document, $){
 		return filterUniqArrayValues( flatArrays(arrays) ); // only unic
 	}
 
-	function getAllUniqAllChildrenPromises(UniqAllChildren){
+	function getChunkPromises(items, chunkLength = 10, getPromisesFunc){
 		return new Promise( (resolve, reject) => {
 
-			const chunk = 10;
 			let count = 0;
 			const results = [];
 
-			for (let i = 0; i < UniqAllChildren.length ; i+=chunk){
+			for (let i = 0; i < items.length ; i+=chunkLength){
 				count++;
 
-				const chunkUniqAllChildren = UniqAllChildren.slice(i,i+chunk);
-				console.log(chunkUniqAllChildren);
+				const itemsChunk = items.slice(i,i+chunkLength);
+				console.log(itemsChunk);
 
 				setTimeout(() => {
 
-					const promises = chunkUniqAllChildren.map( user => {
-						return API.getUserRelatives(user.userId_str);
-					});
+					const promises = getPromisesFunc(itemsChunk); 
+
+					console.log(promises);
 
 					console.log('send chunk');
 
@@ -80,7 +79,7 @@ export default (function App(window, document, $){
 						reject( err );
 					});
 
-				}, count*500);
+				}, count*150);
 			}
 
 		});
@@ -155,28 +154,56 @@ export default (function App(window, document, $){
 			
 			const UniqAllChildren = getUniqValuesFromArrays(allEguGroupsChildrens);
 			
-			return getAllUniqAllChildrenPromises(UniqAllChildren);
+			return getChunkPromises(UniqAllChildren, 10, (array) => {
+				return array.map( user => {
+					return API.getUserRelatives(user.userId_str);
+				});
+			});
 		})
 		.then( allPersonsParents => {
 			console.log(allPersonsParents);
 
 			const UniqAllParents = getUniqValuesFromArrays(allPersonsParents);
 
-			//get ids and filter own profile out
-			const UniqAllParentsIds = UniqAllParents.map( parent => {
+			//get ids and filter own profile and profile with no ID out
+			//and send only ot mothers and fathers
+			const UniqAllParentsIds = UniqAllParents.filter( parent => {
+			 	if ( !parent.person.userId_str || (parent.person.userId_str === profile.id_str) ){
+			 		return false;
+			 	}
+			 	if (parent.type !== 'Mother' && parent.type !== 'Father'){
+			 		return false;
+			 	}
+			 	return true;
+			}).map( parent => {
 				return parent.person.userId_str
-			}).filter( parentId => {
-			 	return parentId !== profile.id_str;
 			});
 
 			console.log(UniqAllParentsIds);
 
-			const invitesData = {
-				userIds: UniqAllParentsIds,
-				message: 'test',
+			const promises = [];
+			const chunkLength = 10;
+			const invitesDatas = [];
+
+			for (let i = 0; i < UniqAllParentsIds.length ; i+=chunkLength){
+
+				const UniqAllParentsIdsChunk = UniqAllParentsIds.slice(i,i+chunkLength);
+
+				const invitesData = {
+					userIds: UniqAllParentsIdsChunk,
+					message: 'test',
+				}
+
+				invitesDatas.push(invitesData);
 			}
 
-			return API.sendInvites(invitesData);
+			console.log('invitesDatas', invitesDatas);
+			
+			return getChunkPromises(invitesDatas, 10, (invitesDatas) => {
+				return invitesDatas.map( invitesData => {
+					return API.sendInvites(invitesData);
+				});
+			});
 		})
 		.then( (res) => {
 			console.log(res);
