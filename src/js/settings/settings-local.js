@@ -14,3 +14,5 @@ export const PromoOptions = {
 	url: 'http://localhost:9000',
 	server: 'https://staging.dnevnik.ru',
 }
+
+

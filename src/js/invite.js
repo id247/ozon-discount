@@ -23,20 +23,67 @@ export default (function App(window, document, $){
 	function buttonHide(message){
 		console.log(message);
 		$button.hide();
+		$result.html(message);
 	}
 
 
 	function isItAParent(){
 		if (profile.roles.indexOf('EduParent') === -1){
-			buttonHide('Только для родителей');
+			buttonHide('Рассылка сообщений только для родителей');
 			return false;
 		}
 		return true;
 	}
 
+	function flatArrays(arrays){
+		return [].concat.apply([], arrays);
+	}
+
+	function filterUniqArrayValues(array){
+		return Array.from(new Set( array ));
+	}
+
 	function getUniqValuesFromArrays(arrays){
-		const joinArrays = [].concat.apply([], arrays); //join in one array
-		return Array.from(new Set(joinArrays)); // only unic
+		return filterUniqArrayValues( flatArrays(arrays) ); // only unic
+	}
+
+	function getAllUniqAllChildrenPromises(UniqAllChildren){
+		return new Promise( (resolve, reject) => {
+
+			const chunk = 10;
+			let count = 0;
+			const results = [];
+
+			for (let i = 0; i < UniqAllChildren.length ; i+=chunk){
+				count++;
+
+				const chunkUniqAllChildren = UniqAllChildren.slice(i,i+chunk);
+				console.log(chunkUniqAllChildren);
+
+				setTimeout(() => {
+
+					const promises = chunkUniqAllChildren.map( user => {
+						return API.getUserRelatives(user.userId_str);
+					});
+
+					console.log('send chunk');
+
+					Promise.all(promises)
+					.then( values => {
+						results.push(values);
+
+						if (results.length === count){
+							resolve( flatArrays(results) );
+						}
+					})
+					.catch( err => {
+						reject( err );
+					});
+
+				}, count*500);
+			}
+
+		});
 	}
 
 
@@ -85,10 +132,8 @@ export default (function App(window, document, $){
 
 			console.log(childrenSchools);
 
-			const promises = [];
-
-			childrenSchools.map( (childrenSchool, i) => {
-				promises.push(API.getPersonEduGroupsBySchool(childrenSchool.childPersonId, childrenSchool.schoolId));
+			const promises = childrenSchools.map( (childrenSchool, i) => {
+				return API.getPersonEduGroupsBySchool(childrenSchool.childPersonId, childrenSchool.schoolId);
 			});
 			
 			return Promise.all(promises);
@@ -98,10 +143,8 @@ export default (function App(window, document, $){
 
 			const UniqEduGroups = getUniqValuesFromArrays(AllEduGroups);
 
-			const promises = [];
-
-			UniqEduGroups.map( eguGroup => {
-				promises.push(API.getEduGroupPersons(eguGroup.id_str));
+			const promises = UniqEduGroups.map( eguGroup => {
+				return API.getEduGroupPersons(eguGroup.id_str);
 			});
 			
 			return Promise.all(promises);
@@ -112,13 +155,7 @@ export default (function App(window, document, $){
 			
 			const UniqAllChildren = getUniqValuesFromArrays(allEguGroupsChildrens);
 			
-			let promises = [];
-
-			UniqAllChildren.map( user => {
-				promises.push(API.getUserRelatives(user.userId_str));
-			});
-			
-			return Promise.all(promises);
+			return getAllUniqAllChildrenPromises(UniqAllChildren);
 		})
 		.then( allPersonsParents => {
 			console.log(allPersonsParents);
@@ -143,11 +180,10 @@ export default (function App(window, document, $){
 		})
 		.then( (res) => {
 			console.log(res);
-			buttonHide('Сообщения были отправлены');
-			$result.html('Сообщения были отправлены');
+			buttonHide('Сообщения были отправлены, спасибо!');
 		})
 		.catch( err => { 
-			$result.html('Произошла ошибка, попробуйте еще раз');
+			$result.html('Произошла ошибка, попробуйте еще раз.');
 			console.error(err);
 		})
 		.then( () => {

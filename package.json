@@ -44,11 +44,10 @@
   },
   "scripts": {
     "lint": "eslint src/js",
-    "prod": "NODE_ENV=prod gulp clean; NODE_ENV=mosreg webpack; NODE_ENV=dnevnik webpack; NODE_ENV=prod gulp prod-no-js;",
-    "stage": "NODE_ENV=prod gulp clean; NODE_ENV=staging webpack; NODE_ENV=prod gulp prod-no-js;",
+    "prod": "NODE_ENV=prod gulp clean; NODE_ENV=mosreg webpack; NODE_ENV=dnevnik webpack; NODE_ENV=staging webpack; NODE_ENV=prod gulp prod-no-js;",
     "prod-html": "NODE_ENV=prod gulp prod-html",
     "prod-css": "NODE_ENV=prod gulp prod-css",
-    "prod-js": "NODE_ENV=mosreg webpack; NODE_ENV=dnevnik webpack;"
+    "prod-js": "NODE_ENV=mosreg webpack; NODE_ENV=dnevnik webpack; NODE_ENV=staging webpack;"
   },
   "author": "",
   "license": "ISC"
