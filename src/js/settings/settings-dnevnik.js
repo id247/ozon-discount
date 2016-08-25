@@ -11,6 +11,6 @@ export const APIoptions = {
 }
 
 export const PromoOptions = {	
-	url: 'https://ad.dnenvik.ru/promo/ozon-discount',
+	url: 'https://ad.dnevnik.ru/promo/ozon-discount',
 	server: 'https://dnevnik.ru',
 }
