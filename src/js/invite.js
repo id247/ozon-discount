@@ -2,9 +2,12 @@
 
 import API from './api/api';
 import OAuth from './api/hello';
+import Cookies from 'js-cookie';
 import { PromoOptions } from 'appSettings';
 
 export default (function App(window, document, $){
+
+	const cookieName = 'im-a-spammer';
 
 	const $button = $('.js-share');
 	const $result = $('.js-share-result');
@@ -224,8 +227,10 @@ export default (function App(window, document, $){
 						+ ' коллективную покупку товаров к школе.'
 						+ ' Сэкономим до 15%.\n'
 						+ ' Вот здесь полные условия акции:'
-						+ ' <a href="' + PromoOptions.url +'">' + PromoOptions.url +'</a>\n'
+						+ ' <a href="' + PromoOptions.url + '&' +  PromoOptions.utm + '">' + PromoOptions.url +'</a>\n'
 						+ ' Что думаете?';
+
+				console.log(text);
 
 				const invitesData = {
 					userIds: UniqAllParentsIdsChunk,
@@ -236,6 +241,7 @@ export default (function App(window, document, $){
 		})
 		.then( (res) => {
 			console.log(res);
+			Cookies.set(cookieName, 'wow');
 			buttonHide('Сообщения были отправлены, спасибо!');
 		})
 		.catch( err => { 
@@ -299,8 +305,13 @@ export default (function App(window, document, $){
 	}
 
 	function init(){
-		getUser();
-		actions();
+
+		if (!Cookies.get(cookieName)){
+			getUser();
+			actions();
+		}else{
+			buttonHide('Вы уже отправляли сообщение родителям класса');
+		}
 	}
 
 	return {

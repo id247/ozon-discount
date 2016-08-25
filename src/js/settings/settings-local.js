@@ -11,7 +11,8 @@ export const APIoptions = {
 }
 
 export const PromoOptions = {	
-	url: 'http://localhost:9000',
+	url: 'https://ad.dnevnik.ru/promo/ozon-discount/',
+	utm: 'utm_source=dnevnik&utm_medium=messenger&utm_campaign=ozonsopt',
 	server: 'https://staging.dnevnik.ru',
 }
 

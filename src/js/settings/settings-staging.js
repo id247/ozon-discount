@@ -30,5 +30,6 @@ export const APIoptions = {
 
 export const PromoOptions = {	
 	url: 'https://ad.school.mosreg.ru/promo/ozon-discount',
+	utm: 'utm_source',
 	server: 'https://school.mosreg.ru',
 }
