@@ -2,6 +2,7 @@
 
 import API from './api/api';
 import OAuth from './api/hello';
+import { PromoOptions } from 'appSettings';
 
 export default (function App(window, document, $){
 
@@ -217,9 +218,18 @@ export default (function App(window, document, $){
 			console.log(UniqAllParentsIds);
 
 			return getChunkPromises(UniqAllParentsIds, 10, (UniqAllParentsIdsChunk) => {
+									
+				let text = 'Здравствуйте! \n'
+						+ ' Предлагаю родителям нашего класса организовать'
+						+ ' коллективную покупку товаров к школе.'
+						+ ' Сэкономим до 15%.\n'
+						+ ' Вот здесь полные условия акции:'
+						+ ' <a href="' + PromoOptions.url +'">' + PromoOptions.url +'</a>\n'
+						+ ' Что думаете?';
+
 				const invitesData = {
 					userIds: UniqAllParentsIdsChunk,
-					message: 'test',
+					message: text,
 				}
 				return API.sendInvites(invitesData);
 			});
