@@ -226,8 +226,8 @@ export default (function App(window, document, $){
 						+ ' Предлагаю родителям нашего класса организовать'
 						+ ' коллективную покупку товаров к школе.'
 						+ ' Сэкономим до 15%.\n'
-						+ ' Вот здесь полные условия акции:'
-						+ ' <a href="' + PromoOptions.url + '&' +  PromoOptions.utm + '">' + PromoOptions.url +'</a>\n'
+						+ ' Вот здесь'
+						+ ' <a href="' + PromoOptions.url + '?' +  PromoOptions.utm + '">полные условия акции</a>.\n'
 						+ ' Что думаете?';
 
 				console.log(text);
